@@ -1,6 +1,6 @@
 # MaMuS (Massively Multilingual Sparse Word Representations)
 
-If you want to use the pretrained multilingual sparse word embeddings that served as the basis for the experiments in the ICLR2020 paper [Massively Multilingual Sparse Word Representations](https://openreview.net/forum?id=HyeYTgrFPB) you can do it so from the above [link](#).
+If you want to use the pretrained multilingual sparse word embeddings that served as the basis for the experiments in the ICLR2020 paper [Massively Multilingual Sparse Word Representations](https://openreview.net/forum?id=HyeYTgrFPB) you can do it so from the above [link](http://www.inf.u-szeged.hu/~berendg/docs/multiling75_isometric_-1_fasttext_cbow100_1200_0.1_unit-sparse0cos_pos.vec.gz).
 
 ## Training your own MaMuS word representations
 
@@ -12,7 +12,9 @@ conda create --name mamus python==3.6.3
 source activate mamus  
 pip install -r requirements.txt && conda install -c conda-forge python-spams  
 
-python mamus.py --embedding-mode fasttext_cbow100 --dictionary-fallback --dictionary-file dictionaries/massively_multiling/parallel.fwdxbwd-dict.fr-en.gz --source-embedding input_dense_vectors/fasttext_cbow100_en.vec.gz --target-embedding input_dense_vectors/fasttext_cbow100_fr.vec.gz --out-path en_fr_mamus.vec > mamus.log 2>&1 &
+wget http://www.inf.u-szeged.hu/~berendg/docs/fasttext_cbow100_{en,fr}.vec.gz
+
+python mamus.py --embedding-mode fasttext_cbow100 --dictionary-fallback --dictionary-file dictionaries/massively_multiling/parallel.fwdxbwd-dict.fr-en.gz --source-embedding fasttext_cbow100_en.vec.gz --target-embedding fasttext_cbow100_fr.vec.gz --out-path en_fr_mamus.vec > mamus.log 2>&1 &
 ```
 
 ## Bibtex for the publication
