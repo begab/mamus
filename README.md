@@ -2,6 +2,10 @@
 
 If you want to use the pretrained multilingual sparse word embeddings that served as the basis for the experiments in the ICLR2020 paper [Massively Multilingual Sparse Word Representations](https://openreview.net/forum?id=HyeYTgrFPB) you can do it so from the above [link](http://www.inf.u-szeged.hu/~berendg/docs/multiling75_isometric_-1_fasttext_cbow100_1200_0.1_unit-sparse0cos_pos.vec.gz).
 
+## Colab demo
+
+You can also familiarize yourself with the kind of sparse we trained in this [Colab notebook](https://colab.research.google.com/drive/1sMtCrGepORHG5t3HI79G6mdA2Npjc9W4)
+
 ## Training your own MaMuS word representations
 
 ```
