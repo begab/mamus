@@ -4,7 +4,7 @@ If you want to use the pretrained multilingual sparse word embeddings that serve
 
 ## Colab demo
 
-You can also familiarize yourself with the kind of sparse we trained in this [Colab notebook](https://colab.research.google.com/drive/1sMtCrGepORHG5t3HI79G6mdA2Npjc9W4)
+You can also familiarize yourself with the kind of sparse representations we trained in this [Colab notebook](https://colab.research.google.com/drive/1sMtCrGepORHG5t3HI79G6mdA2Npjc9W4)
 
 ## Training your own MaMuS word representations
 
