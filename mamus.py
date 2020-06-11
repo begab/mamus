@@ -163,7 +163,7 @@ class CrossLingMapper:
 
 def main():
     t = time.time()
-    parser = argparse.ArgumentParser(description='Run Xling Sparse Coding')
+    parser = argparse.ArgumentParser(description='Produces MaMuS (MAssively MUltilingual Sparse) word representations')
     parser.add_argument('--preproc-steps', help='in what way input vectors to be preprocessed', choices=['intact', 'unit', 'unit-center', 'center', 'center-unit'], required=False, default='unit')
     parser.add_argument('--embedding-mode', required=True)
     parser.add_argument('--lda', help='lambda for sparse coding [default: 0.1]', type=float, default=0.1)
@@ -197,31 +197,35 @@ def main():
     tgt, src, pseudo_dict = clm.align_embeddings(max_aligned=args.max_aligned_words)
     trafo = clm.transform_representations(tgt, src, mapping_mode=args.trafo_type)
 
-    params = {'K':args.K, 'lambda1':args.lda, 'numThreads':8, 'batchsize':400, 'iter':1000, 'verbose':False, 'posAlpha':args.nonneg}
-    l_params = {x:params[x] for x in ['L','lambda1','lambda2','mode','pos','ols','numThreads','length_path','verbose'] if x in params}
-    l_params['pos'] = args.nonneg
-    fid = './decompositions/{}_{}_{}_{}_{}_{}'.format(args.source_lang_id,
-                                                        'pos' if args.nonneg else 'nopos',
-                                                        args.embedding_mode,
-                                                        args.K,
-                                                        args.lda,
-                                                        args.preproc_steps)
+    if args.lda > 0:
+        params = {'K':args.K, 'lambda1':args.lda, 'numThreads':8, 'batchsize':400, 'iter':1000, 'verbose':False, 'posAlpha':args.nonneg}
+        l_params = {x:params[x] for x in ['L','lambda1','lambda2','mode','pos','ols','numThreads','length_path','verbose'] if x in params}
+        l_params['pos'] = args.nonneg
+        fid = './decompositions/{}_{}_{}_{}_{}_{}'.format(args.source_lang_id,
+                                                          'pos' if args.nonneg else 'nopos',
+                                                          args.embedding_mode,
+                                                          args.K,
+                                                          args.lda,
+                                                          args.preproc_steps)
 
-    S_dict = clm.learn_semantic_atoms(clm.embeddingsS, args.source_corpus, clm.squared_normsS, clm.w2iS, params, file_id=fid)
+        S_dict = clm.learn_semantic_atoms(clm.embeddingsS, args.source_corpus, clm.squared_normsS, clm.w2iS, params, file_id=fid)
 
-    if args.source_lang_id == args.target_lang_id:
-        S_alphas = clm.learn_sparse_coeffs(clm.embeddingsS.T, S_dict, l_params)
+        if args.source_lang_id == args.target_lang_id:
+            S_alphas = clm.learn_sparse_coeffs(clm.embeddingsS.T, S_dict, l_params)
 
-        nnz = 100*(1 - S_alphas.nnz / np.prod(S_alphas.shape))
+            nnz = 100*(1 - S_alphas.nnz / np.prod(S_alphas.shape))
+            logging.info("time:\t{}\tnnz:\t{}".format(time.time() - t, nnz))
+            clm.write_multiling_embeddings(S_alphas, args.out_path)
+            sys.exit(1)
+
+        T_alphas_modded = clm.learn_sparse_coeffs(clm.embeddingsT_modded.T, S_dict, l_params)
+
+        clm.write_multiling_embeddings(T_alphas_modded, args.out_path)
+        nnz = 100*(1 - T_alphas_modded.nnz / np.prod(T_alphas_modded.shape))
         logging.info("time:\t{}\tnnz:\t{}".format(time.time() - t, nnz))
-        clm.write_multiling_embeddings(S_alphas, args.out_path)
-        sys.exit(1)
-
-    T_alphas_modded = clm.learn_sparse_coeffs(clm.embeddingsT_modded.T, S_dict, l_params)
-
-    clm.write_multiling_embeddings(T_alphas_modded, args.out_path)
-    nnz = 100*(1 - T_alphas_modded.nnz / np.prod(T_alphas_modded.shape))
-    logging.info("time:\t{}\tnnz:\t{}".format(time.time() - t, nnz))
+    else: # do mapping directly based on the dense input emebeddings
+        logging.info("The outputs are going to be dense embeddings as the command line argument for lambda was set to be zero.")
+        clm.write_multiling_embeddings(clm.embeddingsT_modded, args.out_path)
 
 if __name__ == "__main__":
   main()
